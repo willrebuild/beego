@@ -280,7 +280,9 @@ func (d *dbBase) PrepareInsert(q dbQuerier, mi *modelInfo) (stmtQuerier, string,
 	sep := fmt.Sprintf("%s, %s", Q, Q)
 	columns := strings.Join(dbcols, sep)
 
+	modelCache.RLock()
 	query := fmt.Sprintf("INSERT INTO %s%s%s (%s%s%s) VALUES (%s)", Q, mi.table, Q, Q, columns, Q, qmarks)
+	modelCache.RUnlock()
 
 	d.ins.ReplaceMarks(&query)
 
@@ -347,7 +349,9 @@ func (d *dbBase) Read(q dbQuerier, mi *modelInfo, ind reflect.Value, tz *time.Lo
 		forUpdate = "FOR UPDATE"
 	}
 
+	modelCache.Lock()
 	query := fmt.Sprintf("SELECT %s%s%s FROM %s%s%s WHERE %s%s%s = ? %s", Q, sels, Q, Q, mi.table, Q, Q, wheres, Q, forUpdate)
+	modelCache.Unlock()
 
 	refs := make([]interface{}, colsNum)
 	for i := range refs {
@@ -474,7 +478,9 @@ func (d *dbBase) InsertValue(q dbQuerier, mi *modelInfo, isMulti bool, names []s
 		qmarks = strings.Repeat(qmarks+"), (", multi-1) + qmarks
 	}
 
+	modelCache.Lock()
 	query := fmt.Sprintf("INSERT INTO %s%s%s (%s%s%s) VALUES (%s)", Q, mi.table, Q, Q, columns, Q, qmarks)
+	modelCache.Unlock()
 
 	d.ins.ReplaceMarks(&query)
 
@@ -573,7 +579,9 @@ func (d *dbBase) InsertOrUpdate(q dbQuerier, mi *modelInfo, ind reflect.Value, a
 		qmarks = strings.Repeat(qmarks+"), (", multi-1) + qmarks
 	}
 	//conflitValue maybe is a int,can`t use fmt.Sprintf
+	modelCache.Lock()
 	query := fmt.Sprintf("INSERT INTO %s%s%s (%s%s%s) VALUES (%s) %s "+qupdates, Q, mi.table, Q, Q, columns, Q, qmarks, iouStr)
+	modelCache.Unlock()
 
 	d.ins.ReplaceMarks(&query)
 
@@ -626,7 +634,9 @@ func (d *dbBase) Update(q dbQuerier, mi *modelInfo, ind reflect.Value, tz *time.
 	sep := fmt.Sprintf("%s = ?, %s", Q, Q)
 	setColumns := strings.Join(setNames, sep)
 
+	modelCache.Lock()
 	query := fmt.Sprintf("UPDATE %s%s%s SET %s%s%s = ? WHERE %s%s%s = ?", Q, mi.table, Q, Q, setColumns, Q, Q, pkName, Q)
+	modelCache.Unlock()
 
 	d.ins.ReplaceMarks(&query)
 
@@ -665,7 +675,9 @@ func (d *dbBase) Delete(q dbQuerier, mi *modelInfo, ind reflect.Value, tz *time.
 	sep := fmt.Sprintf("%s = ? AND %s", Q, Q)
 	wheres := strings.Join(whereCols, sep)
 
+	modelCache.Lock()
 	query := fmt.Sprintf("DELETE FROM %s%s%s WHERE %s%s%s = ?", Q, mi.table, Q, Q, wheres, Q)
+	modelCache.Unlock()
 
 	d.ins.ReplaceMarks(&query)
 	res, err := q.Exec(query, args...)
@@ -752,12 +764,14 @@ func (d *dbBase) UpdateBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Con
 
 	sets := strings.Join(cols, ", ") + " "
 
+	modelCache.Lock()
 	if d.ins.SupportUpdateJoin() {
 		query = fmt.Sprintf("UPDATE %s%s%s T0 %sSET %s%s", Q, mi.table, Q, join, sets, where)
 	} else {
 		supQuery := fmt.Sprintf("SELECT T0.%s%s%s FROM %s%s%s T0 %s%s", Q, mi.fields.pk.column, Q, Q, mi.table, Q, join, where)
 		query = fmt.Sprintf("UPDATE %s%s%s SET %sWHERE %s%s%s IN ( %s )", Q, mi.table, Q, sets, Q, mi.fields.pk.column, Q, supQuery)
 	}
+	modelCache.Unlock()
 
 	d.ins.ReplaceMarks(&query)
 	res, err := q.Exec(query, values...)
@@ -814,7 +828,9 @@ func (d *dbBase) DeleteBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Con
 	join := tables.getJoinSQL()
 
 	cols := fmt.Sprintf("T0.%s%s%s", Q, mi.fields.pk.column, Q)
+	modelCache.Lock()
 	query := fmt.Sprintf("SELECT %s FROM %s%s%s T0 %s%s", cols, Q, mi.table, Q, join, where)
+	modelCache.Unlock()
 
 	d.ins.ReplaceMarks(&query)
 
@@ -850,7 +866,9 @@ func (d *dbBase) DeleteBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Con
 		marks[i] = "?"
 	}
 	sql := fmt.Sprintf("IN (%s)", strings.Join(marks, ", "))
+	modelCache.Lock()
 	query = fmt.Sprintf("DELETE FROM %s%s%s WHERE %s%s%s %s", Q, mi.table, Q, Q, mi.fields.pk.column, Q, sql)
+	modelCache.Unlock()
 
 	d.ins.ReplaceMarks(&query)
 	res, err := q.Exec(query, args...)
@@ -872,7 +890,6 @@ func (d *dbBase) DeleteBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Con
 
 // read related records.
 func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condition, container interface{}, tz *time.Location, cols []string) (int64, error) {
-
 	val := reflect.ValueOf(container)
 	ind := reflect.Indirect(val)
 
@@ -967,7 +984,9 @@ func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condi
 	if qs.distinct {
 		sqlSelect += " DISTINCT"
 	}
+	modelCache.Lock()
 	query := fmt.Sprintf("%s %s FROM %s%s%s T0 %s%s%s%s%s", sqlSelect, sels, Q, mi.table, Q, join, where, groupBy, orderBy, limit)
+	modelCache.Unlock()
 
 	d.ins.ReplaceMarks(&query)
 
@@ -1097,7 +1116,9 @@ func (d *dbBase) Count(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condition
 
 	Q := d.ins.TableQuote()
 
+	modelCache.Lock()
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s%s%s T0 %s%s%s", Q, mi.table, Q, join, where, groupBy)
+	modelCache.Unlock()
 
 	if groupBy != "" {
 		query = fmt.Sprintf("SELECT COUNT(*) FROM (%s) AS T", query)
@@ -1624,7 +1645,9 @@ func (d *dbBase) ReadValues(q dbQuerier, qs *querySet, mi *modelInfo, cond *Cond
 	if qs.distinct {
 		sqlSelect += " DISTINCT"
 	}
+	modelCache.Lock()
 	query := fmt.Sprintf("%s %s FROM %s%s%s T0 %s%s%s%s%s", sqlSelect, sels, Q, mi.table, Q, join, where, groupBy, orderBy, limit)
+	modelCache.Unlock()
 
 	d.ins.ReplaceMarks(&query)
 

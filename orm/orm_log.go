@@ -21,6 +21,7 @@ import (
 	"log"
 	"strings"
 	"time"
+	"sync/atomic"
 )
 
 // Log implement the log.Logger
@@ -36,6 +37,10 @@ func NewLog(out io.Writer) *Log {
 }
 
 func debugLogQueies(alias *alias, operaton, query string, t time.Time, err error, args ...interface{}) {
+	if atomic.LoadInt32(&LogPause) == 1 {
+		return
+	}
+
 	sub := time.Now().Sub(t) / 1e5
 	elsp := float64(int(sub)) / 10.0
 	flag := "  OK"

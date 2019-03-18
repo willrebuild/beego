@@ -107,6 +107,10 @@ func (d *commandSyncDb) Run() error {
 
 	if d.force {
 		for i, mi := range modelCache.allOrdered() {
+			if mi.needcreate == false {
+				continue
+			}
+
 			query := drops[i]
 			if !d.noInfo {
 				fmt.Printf("drop table `%s`\n", mi.table)
@@ -135,6 +139,10 @@ func (d *commandSyncDb) Run() error {
 	}
 
 	for i, mi := range modelCache.allOrdered() {
+		if mi.needcreate == false {
+			continue
+		}
+
 		if tables[mi.table] {
 			if !d.noInfo {
 				fmt.Printf("table `%s` already exists, skip\n", mi.table)

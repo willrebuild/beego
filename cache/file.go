@@ -208,6 +208,13 @@ func (fc *FileCache) ClearAll() error {
 	return nil
 }
 
+func (fc *FileCache) HGet(key string, field string) interface{} {
+	return nil
+}
+func (fc *FileCache) HPut(key string, field string, val interface{}) error {
+	return nil
+}
+
 // check file exist.
 func exists(path string) (bool, error) {
 	_, err := os.Stat(path)

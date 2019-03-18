@@ -65,6 +65,9 @@ type Cache interface {
 	ClearAll() error
 	// start gc routine based on config string settings.
 	StartAndGC(config string) error
+
+	HGet(key string, field string) interface{}
+	HPut(key string, field string, val interface{}) error
 }
 
 // Instance is a function create a new Cache Instance

@@ -75,6 +75,21 @@ func (rc *Cache) Get(key string) interface{} {
 	return nil
 }
 
+func (rc *Cache) HGet(key string, filed string) interface{} {
+	if v, err := rc.do("HGET", key, filed); err == nil {
+		return v
+	}
+	return nil
+}
+
+// Put put cache to redis.
+func (rc *Cache) HPut(key string, filed string, val interface{}) error {
+	if _, err := rc.do("HSET", key, filed, val); err != nil {
+		return err
+	}
+	return nil
+}
+
 // GetMulti get cache from redis.
 func (rc *Cache) GetMulti(keys []string) []interface{} {
 	size := len(keys)
