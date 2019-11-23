@@ -897,8 +897,8 @@ func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condi
 	one := true
 	isPtr := true
 
+	fn := ""
 	if val.Kind() == reflect.Ptr {
-		fn := ""
 		if ind.Kind() == reflect.Slice {
 			one = false
 			typ := ind.Type().Elem()
@@ -910,16 +910,16 @@ func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condi
 				fn = getFullName(typ)
 			}
 		} else {
-			fn = getFullName(ind.Type())
+			fn = getFullName2(ind.Type(), val)
 		}
 		errTyp = fn != mi.fullName
 	}
 
 	if errTyp {
 		if one {
-			panic(fmt.Errorf("wrong object type `%s` for rows scan, need *%s", val.Type(), mi.fullName))
+			panic(fmt.Errorf("wrong object type `%s` %s for rows scan, need *%s", val.Type(), fn, mi.fullName))
 		} else {
-			panic(fmt.Errorf("wrong object type `%s` for rows scan, need *[]*%s or *[]%s", val.Type(), mi.fullName, mi.fullName))
+			panic(fmt.Errorf("wrong object type `%s` %s for rows scan, need *[]*%s or *[]%s", val.Type(), fn, mi.fullName, mi.fullName))
 		}
 	}
 

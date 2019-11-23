@@ -20,8 +20,8 @@ import (
 	"io"
 	"log"
 	"strings"
-	"time"
 	"sync/atomic"
+	"time"
 )
 
 // Log implement the log.Logger

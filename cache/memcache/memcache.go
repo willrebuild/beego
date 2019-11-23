@@ -35,8 +35,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/willrebuild/beego/cache"
 	"github.com/bradfitz/gomemcache/memcache"
+	"github.com/willrebuild/beego/cache"
 )
 
 // Cache Memcache adapter.

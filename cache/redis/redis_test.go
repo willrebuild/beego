@@ -18,8 +18,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/willrebuild/beego/cache"
 	"github.com/garyburd/redigo/redis"
+	"github.com/willrebuild/beego/cache"
 )
 
 func TestRedisCache(t *testing.T) {

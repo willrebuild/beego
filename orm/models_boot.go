@@ -24,7 +24,7 @@ import (
 // register models.
 // PrefixOrSuffix means table name prefix or suffix.
 // isPrefix whether the prefix is prefix or suffix
-func registerModel(PrefixOrSuffix string, needcreate bool, model interface{}, isPrefix bool) {
+func registerModel(PrefixOrSuffix string, needCreate bool, model interface{}, isPrefix bool) {
 	modelCache.Lock()
 	defer modelCache.Unlock()
 
@@ -32,7 +32,7 @@ func registerModel(PrefixOrSuffix string, needcreate bool, model interface{}, is
 	typ := reflect.Indirect(val).Type()
 
 	if val.Kind() != reflect.Ptr {
-		panic(fmt.Errorf("<orm.RegisterModel> cannot use non-ptr model struct `%s`", getFullName(typ)))
+		panic(fmt.Errorf("<orm.RegisterModel> cannot use non-ptr model struct `%s`", getFullName2(typ, val)))
 	}
 	// For this case:
 	// u := &User{}
@@ -51,7 +51,7 @@ func registerModel(PrefixOrSuffix string, needcreate bool, model interface{}, is
 		}
 	}
 	// models's fullname is pkgpath + struct name
-	name := getFullName(typ)
+	name := getFullName2(typ, val)
 	if _, ok := modelCache.getByFullName(name); ok {
 		fmt.Printf("<orm.RegisterModel> model `%s` repeat register, must be unique\n", name)
 		os.Exit(2)
@@ -88,7 +88,7 @@ func registerModel(PrefixOrSuffix string, needcreate bool, model interface{}, is
 	mi.pkg = typ.PkgPath()
 	mi.model = model
 	mi.manual = true
-	mi.needcreate = needcreate
+	mi.needCreate = needCreate
 
 	modelCache.set(table, mi)
 }
@@ -118,7 +118,7 @@ func bootStrap() {
 					elm = elm.Elem()
 				}
 				// check the rel or reverse model already register
-				name := getFullName(elm)
+				name := getFullName2(elm, fi.addrValue)
 				mii, ok := modelCache.getByFullName(name)
 				if !ok || mii.pkg != elm.PkgPath() {
 					err = fmt.Errorf("can not find rel in field `%s`, `%s` may be miss register", fi.fullName, elm.String())
@@ -307,21 +307,21 @@ end:
 }
 
 // RegisterModel register models
-func RegisterModel(needcreate bool, models ...interface{}) {
+func RegisterModel(needCreate bool, models ...interface{}) {
 	if modelCache.done {
 		panic(fmt.Errorf("RegisterModel must be run before BootStrap"))
 	}
-	RegisterModelWithPrefix("", needcreate, models...)
+	RegisterModelWithPrefix("", needCreate, models...)
 }
 
 // RegisterModelWithPrefix register models with a prefix
-func RegisterModelWithPrefix(prefix string, needcreate bool, models ...interface{}) {
+func RegisterModelWithPrefix(prefix string, needCreate bool, models ...interface{}) {
 	if modelCache.done {
 		panic(fmt.Errorf("RegisterModelWithPrefix must be run before BootStrap"))
 	}
 
 	for _, model := range models {
-		registerModel(prefix, needcreate, model, true)
+		registerModel(prefix, needCreate, model, true)
 	}
 }
 
@@ -332,7 +332,7 @@ func RegisterModelWithSuffix(suffix string, models ...interface{}) {
 	}
 
 	for _, model := range models {
-		registerModel(suffix, true, model, false)
+		registerModel(suffix, false, model, false)
 	}
 }
 

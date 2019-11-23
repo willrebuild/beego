@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/willrebuild/beego/session"
 	"github.com/ssdb/gossdb/ssdb"
+	"github.com/willrebuild/beego/session"
 )
 
 var ssdbProvider = &Provider{}

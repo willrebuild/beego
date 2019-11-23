@@ -40,9 +40,9 @@
 package authz
 
 import (
+	"github.com/hsluoyz/casbin"
 	"github.com/willrebuild/beego"
 	"github.com/willrebuild/beego/context"
-	"github.com/hsluoyz/casbin"
 	"net/http"
 )
 

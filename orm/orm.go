@@ -68,7 +68,7 @@ const (
 // Define common vars
 var (
 	Debug            = false
-	LogPause = int32(0)
+	LogPause         = int32(0)
 	DebugLog         = NewLog(os.Stdout)
 	DefaultRowsLimit = 1000
 	DefaultRelsDepth = 2
@@ -105,9 +105,9 @@ func (o *orm) getMiInd(md interface{}, needPtr bool) (mi *modelInfo, ind reflect
 	ind = reflect.Indirect(val)
 	typ := ind.Type()
 	if needPtr && val.Kind() != reflect.Ptr {
-		panic(fmt.Errorf("<Ormer> cannot use non-ptr model struct `%s`", getFullName(typ)))
+		panic(fmt.Errorf("<Ormer> cannot use non-ptr model struct `%s`", getFullName2(typ, val)))
 	}
-	name := getFullName(typ)
+	name := getFullName2(typ, val)
 	if mi, ok := modelCache.getByFullName(name); ok {
 		return mi, ind
 	}
@@ -434,7 +434,7 @@ func (o *orm) QueryTable(ptrStructOrTableName interface{}) (qs QuerySeter) {
 			qs = newQuerySet(o, mi)
 		}
 	} else {
-		name = getFullName(indirectType(reflect.TypeOf(ptrStructOrTableName)))
+		name = getFullName2(indirectType(reflect.TypeOf(ptrStructOrTableName)), reflect.ValueOf(ptrStructOrTableName))
 		if mi, ok := modelCache.getByFullName(name); ok {
 			qs = newQuerySet(o, mi)
 		}

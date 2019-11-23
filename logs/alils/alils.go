@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/willrebuild/beego/logs"
 	"github.com/gogo/protobuf/proto"
+	"github.com/willrebuild/beego/logs"
 )
 
 const (

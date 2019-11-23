@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/willrebuild/beego/logs"
 	"github.com/belogik/goes"
+	"github.com/willrebuild/beego/logs"
 )
 
 // NewES return a LoggerInterface

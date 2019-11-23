@@ -51,6 +51,10 @@ func getFullName(typ reflect.Type) string {
 	return typ.PkgPath() + "." + typ.Name()
 }
 
+func getFullName2(typ reflect.Type, val reflect.Value) string {
+	return typ.PkgPath() + "." + getTableName(val)
+}
+
 // getTableName get struct table name.
 // If the struct implement the TableName, then get the result as tablename
 // else use the struct name which will apply snakeString.

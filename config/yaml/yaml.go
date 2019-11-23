@@ -40,8 +40,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/willrebuild/beego/config"
 	"github.com/beego/goyaml2"
+	"github.com/willrebuild/beego/config"
 )
 
 // Config is a yaml config parser and implements Config interface.

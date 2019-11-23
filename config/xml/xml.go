@@ -39,8 +39,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/willrebuild/beego/config"
 	"github.com/beego/x2j"
+	"github.com/willrebuild/beego/config"
 )
 
 // Config is a xml config parser and implements Config interface.

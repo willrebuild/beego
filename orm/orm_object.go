@@ -37,7 +37,7 @@ func (o *insertSet) Insert(md interface{}) (int64, error) {
 	val := reflect.ValueOf(md)
 	ind := reflect.Indirect(val)
 	typ := ind.Type()
-	name := getFullName(typ)
+	name := getFullName2(typ, val)
 	if val.Kind() != reflect.Ptr {
 		panic(fmt.Errorf("<Inserter.Insert> cannot use non-ptr model struct `%s`", name))
 	}

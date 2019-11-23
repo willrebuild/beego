@@ -107,7 +107,7 @@ func (d *commandSyncDb) Run() error {
 
 	if d.force {
 		for i, mi := range modelCache.allOrdered() {
-			if mi.needcreate == false {
+			if mi.needCreate == false {
 				continue
 			}
 
@@ -139,7 +139,7 @@ func (d *commandSyncDb) Run() error {
 	}
 
 	for i, mi := range modelCache.allOrdered() {
-		if mi.needcreate == false {
+		if mi.needCreate == false {
 			continue
 		}
 

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/willrebuild/beego/session"
 	"github.com/siddontang/ledisdb/config"
 	"github.com/siddontang/ledisdb/ledis"
+	"github.com/willrebuild/beego/session"
 )
 
 var (

@@ -15,10 +15,10 @@
 package authz
 
 import (
+	"github.com/hsluoyz/casbin"
 	"github.com/willrebuild/beego"
 	"github.com/willrebuild/beego/context"
 	"github.com/willrebuild/beego/plugins/auth"
-	"github.com/hsluoyz/casbin"
 	"net/http"
 	"net/http/httptest"
 	"testing"

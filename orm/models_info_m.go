@@ -22,17 +22,17 @@ import (
 
 // single model info
 type modelInfo struct {
-	pkg       string
-	name      string
-	fullName  string
-	table     string
-	model     interface{}
-	fields    *fields
-	manual    bool
-	needcreate bool
-	addrField reflect.Value //store the original struct value
-	uniques   []string
-	isThrough bool
+	pkg        string
+	name       string
+	fullName   string
+	table      string
+	model      interface{}
+	fields     *fields
+	manual     bool
+	needCreate bool
+	addrField  reflect.Value //store the original struct value
+	uniques    []string
+	isThrough  bool
 }
 
 // new model info
@@ -42,8 +42,8 @@ func newModelInfo(val reflect.Value) (mi *modelInfo) {
 	ind := reflect.Indirect(val)
 	mi.addrField = val
 	mi.name = ind.Type().Name()
-	mi.fullName = getFullName(ind.Type())
-	mi.needcreate = true
+	mi.fullName = getFullName2(ind.Type(), val)
+	mi.needCreate = true
 	addModelFields(mi, ind, "", []int{})
 	return
 }
@@ -145,6 +145,6 @@ func newM2MModelInfo(m1, m2 *modelInfo) (mi *modelInfo) {
 	mi.fields.pk = fa
 
 	mi.uniques = []string{f1.column, f2.column}
-	mi.needcreate = true
+	mi.needCreate = true
 	return
 }
