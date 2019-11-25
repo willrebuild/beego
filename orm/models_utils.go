@@ -52,7 +52,12 @@ func getFullName(typ reflect.Type) string {
 }
 
 func getFullName2(typ reflect.Type, val reflect.Value) string {
-	return typ.PkgPath() + "." + getTableName(val)
+	tblName := getTableName(val)
+	if len(tblName) == 0 {
+		p := reflect.New(typ)
+		tblName = getTableName(p)
+	}
+	return typ.PkgPath() + "." + tblName
 }
 
 // getTableName get struct table name.

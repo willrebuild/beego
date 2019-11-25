@@ -904,10 +904,10 @@ func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condi
 			typ := ind.Type().Elem()
 			switch typ.Kind() {
 			case reflect.Ptr:
-				fn = getFullName(typ.Elem())
+				fn = getFullName2(typ.Elem(), val)
 			case reflect.Struct:
 				isPtr = false
-				fn = getFullName(typ)
+				fn = getFullName2(typ, val)
 			}
 		} else {
 			fn = getFullName2(ind.Type(), val)
