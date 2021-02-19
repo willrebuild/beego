@@ -207,6 +207,13 @@ func (bc *MemoryCache) StartAndGC(config string) error {
 	return nil
 }
 
+func (bc *MemoryCache) HGet(key string, field string) interface{} {
+	return nil
+}
+func (bc *MemoryCache) HPut(key string, field string, val interface{}) error {
+	return nil
+}
+
 // check expiration.
 func (bc *MemoryCache) vacuum() {
 	bc.RLock()

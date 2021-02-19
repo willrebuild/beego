@@ -24,7 +24,10 @@ import (
 // register models.
 // PrefixOrSuffix means table name prefix or suffix.
 // isPrefix whether the prefix is prefix or suffix
-func registerModel(PrefixOrSuffix string, model interface{}, isPrefix bool) {
+func registerModel(PrefixOrSuffix string, needcreate bool, model interface{}, isPrefix bool) {
+	modelCache.Lock()
+	defer modelCache.Unlock()
+
 	val := reflect.ValueOf(model)
 	typ := reflect.Indirect(val).Type()
 
@@ -85,6 +88,7 @@ func registerModel(PrefixOrSuffix string, model interface{}, isPrefix bool) {
 	mi.pkg = typ.PkgPath()
 	mi.model = model
 	mi.manual = true
+	mi.needcreate = needcreate
 
 	modelCache.set(table, mi)
 }
@@ -303,21 +307,21 @@ end:
 }
 
 // RegisterModel register models
-func RegisterModel(models ...interface{}) {
+func RegisterModel(needcreate bool, models ...interface{}) {
 	if modelCache.done {
 		panic(fmt.Errorf("RegisterModel must be run before BootStrap"))
 	}
-	RegisterModelWithPrefix("", models...)
+	RegisterModelWithPrefix("", needcreate, models...)
 }
 
 // RegisterModelWithPrefix register models with a prefix
-func RegisterModelWithPrefix(prefix string, models ...interface{}) {
+func RegisterModelWithPrefix(prefix string, needcreate bool, models ...interface{}) {
 	if modelCache.done {
 		panic(fmt.Errorf("RegisterModelWithPrefix must be run before BootStrap"))
 	}
 
 	for _, model := range models {
-		registerModel(prefix, model, true)
+		registerModel(prefix, needcreate, model, true)
 	}
 }
 
@@ -328,18 +332,34 @@ func RegisterModelWithSuffix(suffix string, models ...interface{}) {
 	}
 
 	for _, model := range models {
-		registerModel(suffix, model, false)
+		registerModel(suffix, true, model, false)
 	}
 }
 
 // BootStrap bootstrap models.
 // make all model parsed and can not add more models
 func BootStrap() {
+	modelCache.Lock()
+	defer modelCache.Unlock()
 	if modelCache.done {
 		return
 	}
-	modelCache.Lock()
-	defer modelCache.Unlock()
 	bootStrap()
 	modelCache.done = true
+}
+
+func SetModelTable(tablename string, newTableName string) {
+	modelCache.Lock()
+	defer modelCache.Unlock()
+
+	info, ok := modelCache.get(tablename)
+
+	if ok == false {
+		//log.Fatalln("SetModelTable", tablename)
+		return
+	}
+
+	info.table = newTableName
+
+	modelCache.set(tablename, info)
 }

@@ -29,6 +29,7 @@ type modelInfo struct {
 	model     interface{}
 	fields    *fields
 	manual    bool
+	needcreate bool
 	addrField reflect.Value //store the original struct value
 	uniques   []string
 	isThrough bool
@@ -42,6 +43,7 @@ func newModelInfo(val reflect.Value) (mi *modelInfo) {
 	mi.addrField = val
 	mi.name = ind.Type().Name()
 	mi.fullName = getFullName(ind.Type())
+	mi.needcreate = true
 	addModelFields(mi, ind, "", []int{})
 	return
 }
@@ -79,7 +81,7 @@ func addModelFields(mi *modelInfo, ind reflect.Value, mName string, index []int)
 		fi.fieldIndex = append(fi.fieldIndex, i)
 		fi.mi = mi
 		fi.inModel = true
-		if !mi.fields.Add(fi) {
+		if mi.fields.Add(fi) == false {
 			err = fmt.Errorf("duplicate column name: %s", fi.column)
 			break
 		}
@@ -144,5 +146,6 @@ func newM2MModelInfo(m1, m2 *modelInfo) (mi *modelInfo) {
 	mi.fields.pk = fa
 
 	mi.uniques = []string{f1.column, f2.column}
+	mi.needcreate = true
 	return
 }

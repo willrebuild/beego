@@ -21,7 +21,7 @@
 //
 //	import (
 //		"fmt"
-//		"github.com/astaxie/beego/orm"
+//		"github.com/willrebuild/beego/orm"
 //		_ "github.com/go-sql-driver/mysql" // import your used driver
 //	)
 //
@@ -71,6 +71,7 @@ const (
 // Define common vars
 var (
 	Debug            = false
+	LogPause = int32(0)
 	DebugLog         = NewLog(os.Stdout)
 	DefaultRowsLimit = 1000
 	DefaultRelsDepth = 2
@@ -100,6 +101,9 @@ var _ Ormer = new(orm)
 
 // get model info and model reflect value
 func (o *orm) getMiInd(md interface{}, needPtr bool) (mi *modelInfo, ind reflect.Value) {
+	modelCache.Lock()
+	defer modelCache.Unlock()
+
 	val := reflect.ValueOf(md)
 	ind = reflect.Indirect(val)
 	typ := ind.Type()
@@ -423,6 +427,9 @@ func (o *orm) getRelQs(md interface{}, mi *modelInfo, fi *fieldInfo) *querySet {
 // table name can be string or struct.
 // e.g. QueryTable("user"), QueryTable(&user{}) or QueryTable((*User)(nil)),
 func (o *orm) QueryTable(ptrStructOrTableName interface{}) (qs QuerySeter) {
+	modelCache.Lock()
+	defer modelCache.Unlock()
+
 	var name string
 	if table, ok := ptrStructOrTableName.(string); ok {
 		name = nameStrategyMap[defaultNameStrategy](table)

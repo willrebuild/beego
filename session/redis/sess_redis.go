@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/astaxie/beego/session/redis"
-//   "github.com/astaxie/beego/session"
+//   _ "github.com/willrebuild/beego/session/redis"
+//   "github.com/willrebuild/beego/session"
 // )
 //
 // 	func init() {
@@ -39,7 +39,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/astaxie/beego/session"
+	"github.com/willrebuild/beego/session"
 
 	"github.com/gomodule/redigo/redis"
 )
